@@ -5,6 +5,32 @@
   "subtitle": "Personal plain YouTubePlus builds",
   "iconURL": "https://raw.githubusercontent.com/ixxexi/YouProEXTRA/main/source/icon.png",
   "sourceURL": "https://raw.githubusercontent.com/ixxexi/YouProEXTRA/main/source/ytplus.json",
-  "apps": [],
+  "apps": [
+    {
+      "name": "YouTubePlus",
+      "bundleIdentifier": "com.google.ios.youtube",
+      "developerName": "dayanch96",
+      "subtitle": "YTLite without audio tweaks",
+      "localizedDescription": "YouTubePlus (YTLite) without the audio tweaks that mute the speaker in Silent mode.",
+      "iconURL": "https://raw.githubusercontent.com/ixxexi/YouProEXTRA/main/source/icon.png",
+      "tintColor": "FF0000",
+      "category": "photo-video",
+      "version": "21.42.4",
+      "versionDate": "2026-10-24",
+      "versionDescription": "YouTube 21.42.4 | YouTubePlus 6.0b2 (patched upstream build)\n\nUpstream mrdrvt99/YouProEXTRA release ytl-ipa7 with these tweaks removed: PleaseDontStopTheMusic VolumeBoostYT.",
+      "downloadURL": "https://github.com/ixxexi/YouProEXTRA/releases/download/p-ytl-ipa7-664218256/YouTubePlus_21.42.4_6.0b2.ipa",
+      "size": 149803265,
+      "versions": [
+        {
+          "version": "21.42.4",
+          "date": "2026-10-24",
+          "localizedDescription": "YouTube 21.42.4 | YouTubePlus 6.0b2 (patched upstream build)\n\nUpstream mrdrvt99/YouProEXTRA release ytl-ipa7 with these tweaks removed: PleaseDontStopTheMusic VolumeBoostYT.",
+          "downloadURL": "https://github.com/ixxexi/YouProEXTRA/releases/download/p-ytl-ipa7-664218256/YouTubePlus_21.42.4_6.0b2.ipa",
+          "size": 149803265,
+          "minOSVersion": "17.0"
+        }
+      ]
+    }
+  ],
   "news": []
 }

@@ -20,8 +20,9 @@ def releases():
 
 versions = []
 for rel in releases():
-    if rel["draft"] or not rel["tag_name"].startswith("ytl-ipa"):
+    if rel["draft"] or not rel["tag_name"].startswith(("ytl-ipa", "p-ytl-ipa")):
         continue
+    kind = "patched upstream build" if rel["tag_name"].startswith("p-") else "plain build"
     for asset in rel["assets"]:
         m = ASSET.match(asset["name"])
         if not m:
@@ -29,7 +30,7 @@ for rel in releases():
         versions.append({
             "version": m["yt"],
             "date": rel["published_at"][:10],
-            "localizedDescription": f"YouTube {m['yt']} | YouTubePlus {m['ytl']} (plain build)",
+            "localizedDescription": f"YouTube {m['yt']} | YouTubePlus {m['ytl']} ({kind})\n\n{rel['body'] or ''}".strip(),
             "downloadURL": asset["browser_download_url"],
             "size": asset["size"],
             "minOSVersion": "17.0",
@@ -46,8 +47,8 @@ if versions:
         "name": "YouTubePlus",
         "bundleIdentifier": "com.google.ios.youtube",
         "developerName": "dayanch96",
-        "subtitle": "Plain YTLite build",
-        "localizedDescription": "YouTubePlus (YTLite) with no extra tweaks. Built from this fork.",
+        "subtitle": "YTLite without audio tweaks",
+        "localizedDescription": "YouTubePlus (YTLite) without the audio tweaks that mute the speaker in Silent mode.",
         "iconURL": f"{RAW}/icon.png",
         "tintColor": "FF0000",
         "category": "photo-video",

@@ -1,0 +1,106 @@
+name: Patch maintainer's YouTubePlus
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      remove:
+        description: "Tweaks to remove (space-separated dylib names)"
+        default: "PleaseDontStopTheMusic VolumeBoostYT"
+        required: false
+        type: string
+      force:
+        description: "Re-patch even if this upstream build was already patched"
+        default: false
+        required: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-source
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: mrdrvt99/YouProEXTRA
+  REMOVE: ${{ inputs.remove || 'PleaseDontStopTheMusic VolumeBoostYT' }}
+  FORCE: ${{ inputs.force || false }}
+
+jobs:
+  patch:
+    name: Strip tweaks from the latest upstream YouTubePlus
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Find latest upstream YouTubePlus release
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          read -r tag asset_id name url < <(gh api "repos/$UPSTREAM/releases?per_page=30" --jq '
+            [.[] | select((.draft | not) and (.tag_name | startswith("ytl-ipa")))] | sort_by(.published_at) | last
+            | .tag_name as $t | .assets[] | select(.name | test("^YouTubePlus_.*\\.ipa$"))
+            | "\($t) \(.id) \(.name) \(.browser_download_url)"' | head -n1)
+          if [ -z "$tag" ]; then echo "::error::No upstream YouTubePlus release found"; exit 1; fi
+          mine="p-${tag}-${asset_id}"
+          echo "Upstream: $tag ($name) -> $mine"
+          if [ "$FORCE" != "true" ] && gh release view "$mine" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Already patched."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo "tag=$tag"
+            echo "mine=$mine"
+            echo "name=$name"
+            echo "url=$url"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Download and strip tweaks
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          URL: ${{ steps.upstream.outputs.url }}
+          NAME: ${{ steps.upstream.outputs.name }}
+        run: |
+          curl -sfL -o "$NAME" "$URL"
+          # cyan injects tweaks as LC_LOAD_WEAK_DYLIB, so a missing dylib is simply skipped at launch
+          removed=""
+          for t in $REMOVE; do
+            p="Payload/YouTube.app/Frameworks/${t}.dylib"
+            if unzip -l "$NAME" "$p" >/dev/null 2>&1; then
+              zip -q -d "$NAME" "$p"
+              removed="$removed $t"
+            fi
+          done
+          unzip -tq "$NAME"
+          echo "REMOVED=${removed# }" >> "$GITHUB_ENV"
+          echo "### Removed: ${removed:- nothing}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish patched release
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.upstream.outputs.tag }}
+          MINE: ${{ steps.upstream.outputs.mine }}
+          NAME: ${{ steps.upstream.outputs.name }}
+        run: |
+          gh release delete "$MINE" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
+          gh release create "$MINE" "$NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "${NAME%.ipa} (patched)" \
+            --notes "Upstream $UPSTREAM release $TAG with these tweaks removed: ${REMOVED:-none}." \
+            --latest
+
+      - name: Rewrite source JSON
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/update_source.py
+
+      - name: Commit source JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/ytplus.json
+          git diff --cached --quiet || { git commit -m "Update SideStore source" && git push; }

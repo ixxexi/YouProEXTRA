@@ -1,0 +1,42 @@
+name: Build plain YouTubePlus
+on:
+  workflow_dispatch:
+    inputs:
+      ipa_url:
+        description: "Direct URL to the decrypted YouTube IPA"
+        required: true
+        type: string
+
+      youpip:
+        description: "Include YouPiP (picture-in-picture)"
+        default: true
+        required: false
+        type: boolean
+
+permissions:
+  actions: write
+
+jobs:
+  dispatch:
+    name: Start YouTubePlus build with no extra tweaks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run the YouTubePlus build with extras turned off
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IPA_URL: ${{ inputs.ipa_url }}
+          YOUPIP: ${{ inputs.youpip }}
+        run: |
+          gh workflow run buildytlite.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF_NAME" \
+            -f ipa_url="$IPA_URL" \
+            -f display_name=YouTube \
+            -f bundle_id=com.google.ios.youtube \
+            -f youpip="$YOUPIP" \
+            -f opensafari=false -f demc=false -f ytuhd=false -f ryd=false \
+            -f ytabconfig=false -f youquality=false -f youchoose=false \
+            -f ytweaks=false -f gonerino=false -f yougetcaption=false \
+            -f ythold=false -f volumeboost=false -f nativeshare=false \
+            -f pleasedontstopthemusic=false
+          echo "### Build started. Follow it under Build YouTubePlus (YTLite) IPA." >> "$GITHUB_STEP_SUMMARY"

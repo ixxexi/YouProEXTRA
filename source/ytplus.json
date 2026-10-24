@@ -1,0 +1,10 @@
+{
+  "name": "My YouTubePlus",
+  "identifier": "com.ixxexi.ytplus",
+  "apiVersion": "v2",
+  "subtitle": "Personal plain YouTubePlus builds",
+  "iconURL": "https://raw.githubusercontent.com/ixxexi/YouProEXTRA/main/source/icon.png",
+  "sourceURL": "https://raw.githubusercontent.com/ixxexi/YouProEXTRA/main/source/ytplus.json",
+  "apps": [],
+  "news": []
+}

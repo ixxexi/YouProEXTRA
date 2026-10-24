@@ -1,0 +1,44 @@
+name: Publish build and update SideStore source
+on:
+  workflow_run:
+    workflows: ["Build YouTubePlus (YTLite) IPA"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-source
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish newest draft and rewrite source JSON
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Publish newest YouTubePlus draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,isDraft,createdAt \
+            --jq '[.[] | select(.isDraft and (.tagName | startswith("ytl-ipa")))] | sort_by(.createdAt) | last | .tagName // empty')
+          if [ -n "$tag" ]; then
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          fi
+
+      - name: Rewrite source JSON
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/update_source.py
+
+      - name: Commit source JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/ytplus.json
+          git diff --cached --quiet || { git commit -m "Update SideStore source" && git push; }

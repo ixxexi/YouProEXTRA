@@ -15,12 +15,20 @@
       "iconURL": "https://raw.githubusercontent.com/ixxexi/YouProEXTRA/main/source/icon.png",
       "tintColor": "FF0000",
       "category": "photo-video",
-      "version": "21.46.3",
+      "version": "21.33.6",
       "versionDate": "2026-11-16",
-      "versionDescription": "YouTube 21.46.3 | YouTubePlus 6.0 (patched upstream build)\n\nUpstream mrdrvt99/YouProEXTRA release ytl-ipa7 with these tweaks removed: VolumeBoostYT.",
-      "downloadURL": "https://github.com/ixxexi/YouProEXTRA/releases/download/p-ytl-ipa7-752251500/YouTubePlus_21.46.3_6.0.ipa",
-      "size": 153379694,
+      "versionDescription": "YouTube 21.33.6 | YouTubePlus 6.0 (patched upstream build)\n\nUpstream mrdrvt99/YouProEXTRA release ytl-ipa7 with these tweaks removed: VolumeBoostYT.",
+      "downloadURL": "https://github.com/ixxexi/YouProEXTRA/releases/download/p-ytl-ipa7-756173604/YouTubePlus_21.33.6_6.0.ipa",
+      "size": 145311135,
       "versions": [
+        {
+          "version": "21.33.6",
+          "date": "2026-11-16",
+          "localizedDescription": "YouTube 21.33.6 | YouTubePlus 6.0 (patched upstream build)\n\nUpstream mrdrvt99/YouProEXTRA release ytl-ipa7 with these tweaks removed: VolumeBoostYT.",
+          "downloadURL": "https://github.com/ixxexi/YouProEXTRA/releases/download/p-ytl-ipa7-756173604/YouTubePlus_21.33.6_6.0.ipa",
+          "size": 145311135,
+          "minOSVersion": "17.0"
+        },
         {
           "version": "21.46.3",
           "date": "2026-11-16",
